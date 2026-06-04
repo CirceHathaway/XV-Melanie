@@ -3,9 +3,8 @@ import React, { useState } from 'react';
 import AnimatedSection from './AnimatedSection';
 import decoEsquinaTop from '../assets/image_1.png';
 import decoEsquinaBottom from '../assets/image_2.png';
-
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+import { db } from '../firebaseConfig'; 
 
 export default function RSVP() {
   const [formData, setFormData] = useState({
@@ -13,6 +12,7 @@ export default function RSVP() {
     asistencia: 'si',
     adultos: '1',
     ninos: '0',
+    nombresAcompanantes: '', // <-- NUEVO ESTADO
     dieta: 'ninguna',
     comentarios: ''
   });
@@ -30,10 +30,9 @@ export default function RSVP() {
     setIsSubmitting(true);
 
     try {
-      // Guardamos en la colección "invitados"
       await addDoc(collection(db, "invitados"), {
         ...formData,
-        fechaConfirmacion: serverTimestamp() // Guarda la fecha y hora exacta
+        fechaConfirmacion: serverTimestamp() 
       });
       
       setSubmitted(true);
@@ -46,7 +45,9 @@ export default function RSVP() {
     }
   };
 
-  // --- PANTALLA DE ÉXITO ACTUALIZADA ---
+  // Calculamos el total de personas para saber si pedir los nombres extra
+  const totalPersonas = parseInt(formData.adultos || 0) + parseInt(formData.ninos || 0);
+
   if (submitted) {
     return (
       <AnimatedSection style={{ marginBottom: '50px', textAlign: 'center' }}>
@@ -60,14 +61,12 @@ export default function RSVP() {
           Tus datos han sido registrados con éxito.
         </p>
         
-        {/* CONDICIONAL: Solo aparece si asiste */}
         {formData.asistencia === 'si' && (
           <p style={{ fontSize: '1.1rem', fontStyle: 'italic', color: 'var(--gold)' }}>
             ¡Espero contar con tu presencia para compartir momentos especiales!
           </p>
         )}
 
-        {/* CONDICIONAL Opcional: Mensaje para los que no asisten */}
         {formData.asistencia === 'no' && (
           <p style={{ fontSize: '1.1rem', fontStyle: 'italic', color: 'var(--gold)' }}>
             ¡Gracias por avisarnos, te extrañaremos mucho!
@@ -89,7 +88,6 @@ export default function RSVP() {
       
       <form onSubmit={handleSubmit} className="rsvp-form">
         
-        {/* NOMBRE COMPLETO */}
         <div className="form-group">
           <label>Nombre y Apellido del Invitado Principal *</label>
           <input 
@@ -98,11 +96,10 @@ export default function RSVP() {
             value={formData.nombre} 
             onChange={handleChange} 
             required 
-            placeholder="Ej: Familia Pérez / Juan Gómez"
+            placeholder="Ej: Juan Pérez"
           />
         </div>
 
-        {/* ASISTENCIA */}
         <div className="form-group">
           <label>¿Podrás asistir? *</label>
           <select name="asistencia" value={formData.asistencia} onChange={handleChange} required>
@@ -111,10 +108,8 @@ export default function RSVP() {
           </select>
         </div>
 
-        {/* Solo mostramos estos campos si la persona SÍ va a asistir */}
         {formData.asistencia === 'si' && (
           <>
-            {/* CANTIDAD DE PERSONAS */}
             <div className="form-row">
               <div className="form-group half">
                 <label>Adultos *</label>
@@ -141,7 +136,21 @@ export default function RSVP() {
               </div>
             </div>
 
-            {/* RESTRICCIONES ALIMENTICIAS */}
+            {/* --- NUEVO: CAMPO DE ACOMPAÑANTES (Solo si hay > 1 persona) --- */}
+            {totalPersonas > 1 && (
+              <div className="form-group">
+                <label>Nombres de los acompañantes *</label>
+                <textarea 
+                  name="nombresAcompanantes" 
+                  rows="2" 
+                  value={formData.nombresAcompanantes} 
+                  onChange={handleChange} 
+                  placeholder="Ej: María Gómez, Pedro Gómez..."
+                  required
+                ></textarea>
+              </div>
+            )}
+
             <div className="form-group">
               <label>Menú Especial (Restricciones)</label>
               <select name="dieta" value={formData.dieta} onChange={handleChange}>
@@ -154,7 +163,6 @@ export default function RSVP() {
               </select>
             </div>
 
-            {/* COMENTARIOS EXTRA */}
             <div className="form-group">
               <label>Comentarios adicionales</label>
               <textarea 
@@ -168,7 +176,6 @@ export default function RSVP() {
           </>
         )}
 
-        {/* BOTÓN DE ENVÍO */}
         <button type="submit" className="btn submit-btn" disabled={isSubmitting}>
           {isSubmitting ? (
             <><i className="fas fa-spinner fa-spin"></i> Enviando...</>
