@@ -20,7 +20,7 @@ export default function Hero() {
             <div className="sun-icon">
               <i className="fas fa-sun"></i>
             </div>
-            <div className="top-title">Mis 15 Años</div>
+            <div className="top-title">Mis XV Años</div>
             <h1>Melanie</h1>
             <div className="hero-quote">
               <i className="fas fa-quote-left"></i>
