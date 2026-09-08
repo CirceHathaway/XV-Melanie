@@ -323,7 +323,7 @@ body {
 @keyframes zoomIn { from { transform: scale(0.8); } to { transform: scale(1); } }
 @keyframes spinLoader { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
 
-/* MEDIA QUERIES (VERSIÓN CELULAR) */
+/* MEDIA QUERIES Main (VERSIÓN CELULAR) */
 @media (max-width: 768px) {
     /* 1. ELIMINAR EL SCROLL FANTASMA: Altura exacta y ocultar lo que sobra de la ola */
     .hero { 
@@ -346,7 +346,7 @@ body {
     
     /* Limpiamos el margen negativo que empujaba todo al techo */
     .hero-text-content { 
-        margin-top: -40px; 
+        margin-top: -50px; 
     } 
     
     .hero-sun { 
@@ -366,7 +366,7 @@ body {
     }
     
     .hero h1 { 
-        font-size: 4.9rem; 
+        font-size: 5.2rem; 
         line-height: 1.2; 
         margin: 20px 0 0 0; /* Un margen mínimo para que no toque 'Mis XV Años' */
         padding: 0 10px; 
@@ -395,7 +395,20 @@ body {
     .date-day-name { font-size: 1.2rem; }
     .venue-name { font-size: 1.8rem; }
     .venue-subtitle { font-size: 1.6rem; }
-    .gallery-title { font-size: 1.5rem; padding: 0 15px; }
+    .gallery-title { 
+        font-size: 1.5rem;
+        display: block; 
+        text-align: center; 
+        margin: 0 auto 30px auto; 
+        padding: 0 15px; 
+    }
+    .carousel-container { 
+        /* Fórmula exacta para centrar: Mitad de pantalla (50vw) menos la mitad de la foto con sus bordes (149px) */
+        padding: 0 calc(50vw - 149px) !important; 
+        
+        /* Empuja agresivamente las fotos adyacentes para que no asomen en la pantalla */
+        gap: 120px !important; 
+    }
     .corner-deco img { width: 60px; }
     .corner-top-left { top: -30px; left: -20px; }
     .corner-top-right { top: -30px; right: -20px; }
@@ -460,30 +473,12 @@ body {
 .lightbox-btn.right { right: 20px; }
 
 /* --- CARRUSEL NATIVO PARA CELULARES --- */
-/* Al reemplazar la lógica de arrastre en JS con CSS nativo, 
-se desliza a 60FPS sin tirones en cualquier celular */
-.gallery-wrapper {
-    width: 100%;
-    overflow-x: auto; 
-    overflow-y: hidden;
+.carousel-viewport {
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE y Edge */
-    scroll-behavior: smooth;
-    scroll-snap-type: x mandatory; /* Imán para que frene en cada foto */
-    padding-left: 20px; /* Margen para que se vea el inicio */
 }
-.gallery-wrapper::-webkit-scrollbar {
+.carousel-viewport::-webkit-scrollbar {
     display: none; /* Oculta la barra de desplazamiento en Chrome/Safari */
-}
-.carousel-container { 
-    display: flex; 
-    gap: 30px; 
-    width: max-content; 
-    padding-right: 40px; /* Espacio extra al llegar a la última foto */
-}
-.polaroid-item {
-    scroll-snap-align: center; /* Alineación magnética al centro */
-    cursor: pointer;
 }
 
 /* Ajustes para celulares */
