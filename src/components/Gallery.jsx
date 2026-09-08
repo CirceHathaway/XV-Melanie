@@ -2,18 +2,22 @@
 import React, { useState } from 'react';
 
 export default function Gallery() {
-  // Tus 6 fotos originales
+  // Tus 10 fotos originales (se agregaron 4 nuevas)
   const fotosOriginales = [
     '/images/foto1.jpg',
     '/images/foto2.jpg',
     '/images/foto3.jpg',
     '/images/foto4.jpg',
     '/images/foto5.jpg',
-    '/images/foto6.jpg'
+    '/images/foto6.jpg',
+    '/images/foto7.jpeg',
+    '/images/foto8.jpeg',
+    '/images/foto9.jpeg',
+    '/images/foto10.jpeg'
   ];
 
-  // TRUCO DE BUCLE: Duplicamos el arreglo 4 veces (24 fotos en total). 
-  // Esto hace que después de la 6, venga la 1 mágicamente al deslizar.
+  // TRUCO DE BUCLE: Duplicamos el arreglo 4 veces (40 fotos en total ahora). 
+  // Esto hace que después de la 10, venga la 1 mágicamente al deslizar.
   const fotosInfinitas = [...fotosOriginales, ...fotosOriginales, ...fotosOriginales, ...fotosOriginales];
 
   const [currentImageIndex, setCurrentImageIndex] = useState(null);

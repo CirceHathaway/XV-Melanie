@@ -532,7 +532,7 @@ body {
 .rsvp-form select,
 .rsvp-form textarea {
     background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(251, 191, 36, 0.5); /* Borde dorado semi-transparente */
+    border: 1px solid rgba(251, 191, 36, 0.5); 
     border-radius: 8px;
     padding: 12px 15px;
     color: #fff;
@@ -540,6 +540,11 @@ body {
     font-size: 1rem;
     outline: none;
     transition: all 0.3s ease;
+    
+    /* --- NUEVO: Fija los límites para que no empujen al botón --- */
+    box-sizing: border-box; 
+    width: 100%; 
+    min-width: 0; 
 }
 
 .rsvp-form input:focus,

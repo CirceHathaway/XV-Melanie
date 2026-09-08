@@ -8,14 +8,15 @@ import { db } from '../firebaseConfig';
 
 export default function RSVP() {
   const [formData, setFormData] = useState({
-    nombre: '',
     asistencia: 'si',
-    adultos: '1',
-    ninos: '0',
-    nombresAcompanantes: '', // <-- NUEVO ESTADO
+    adultos: '1', // <-- VUELVE EL ESTADO DE ADULTOS
+    ninos: '0',   // <-- VUELVE EL ESTADO DE NIÑOS
     dieta: 'ninguna',
     comentarios: ''
   });
+
+  const [nombreInput, setNombreInput] = useState('');
+  const [listaNombres, setListaNombres] = useState([]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -25,13 +26,33 @@ export default function RSVP() {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleAgregarNombre = (e) => {
+    e.preventDefault(); 
+    if (nombreInput.trim() !== '') {
+      setListaNombres([...listaNombres, nombreInput.trim()]);
+      setNombreInput(''); 
+    }
+  };
+
+  const handleBorrarNombre = (index) => {
+    const nuevaLista = listaNombres.filter((_, i) => i !== index);
+    setListaNombres(nuevaLista);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (listaNombres.length === 0 && formData.asistencia === 'si') {
+      alert("Por favor, agrega al menos un nombre a la lista de invitados.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       await addDoc(collection(db, "invitados"), {
         ...formData,
+        nombres: listaNombres,
         fechaConfirmacion: serverTimestamp() 
       });
       
@@ -44,9 +65,6 @@ export default function RSVP() {
       setIsSubmitting(false);
     }
   };
-
-  // Calculamos el total de personas para saber si pedir los nombres extra
-  const totalPersonas = parseInt(formData.adultos || 0) + parseInt(formData.ninos || 0);
 
   if (submitted) {
     return (
@@ -89,18 +107,6 @@ export default function RSVP() {
       <form onSubmit={handleSubmit} className="rsvp-form">
         
         <div className="form-group">
-          <label>Nombre y Apellido del Invitado Principal *</label>
-          <input 
-            type="text" 
-            name="nombre" 
-            value={formData.nombre} 
-            onChange={handleChange} 
-            required 
-            placeholder="Ej: Juan Pérez"
-          />
-        </div>
-
-        <div className="form-group">
           <label>¿Podrás asistir? *</label>
           <select name="asistencia" value={formData.asistencia} onChange={handleChange} required>
             <option value="si">¡Sí, ahí estaré!</option>
@@ -110,46 +116,103 @@ export default function RSVP() {
 
         {formData.asistencia === 'si' && (
           <>
+            {/* --- VUELVEN LOS CONTADORES --- */}
             <div className="form-row">
               <div className="form-group half">
                 <label>Adultos *</label>
-                <input 
-                  type="number" 
+                <select 
                   name="adultos" 
-                  min="1" 
-                  max="10" 
                   value={formData.adultos} 
                   onChange={handleChange} 
                   required
-                />
+                >
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                </select>
               </div>
               <div className="form-group half">
                 <label>Niños (menores de 12)</label>
-                <input 
-                  type="number" 
+                <select 
                   name="ninos" 
-                  min="0" 
-                  max="10" 
                   value={formData.ninos} 
-                  onChange={handleChange} 
-                />
+                  onChange={handleChange}
+                >
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                </select>
               </div>
             </div>
 
-            {/* --- NUEVO: CAMPO DE ACOMPAÑANTES (Solo si hay > 1 persona) --- */}
-            {totalPersonas > 1 && (
-              <div className="form-group">
-                <label>Nombres de los acompañantes *</label>
-                <textarea 
-                  name="nombresAcompanantes" 
-                  rows="2" 
-                  value={formData.nombresAcompanantes} 
-                  onChange={handleChange} 
-                  placeholder="Ej: María Gómez, Pedro Gómez..."
-                  required
-                ></textarea>
+            <div className="form-group">
+              <label>Ingresar el NOMBRE y APELLIDO de cada invitado *</label>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <input 
+                  type="text" 
+                  value={nombreInput} 
+                  onChange={(e) => setNombreInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleAgregarNombre(e)}
+                  placeholder="Ej: Juan Pérez"
+                  style={{ flex: 1 }}
+                />
+                <button 
+                  type="button" 
+                  onClick={handleAgregarNombre}
+                  style={{
+                    padding: '0 20px',
+                    background: 'var(--gold)',
+                    color: 'var(--purple-deep)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Agregar
+                </button>
               </div>
-            )}
+
+              {listaNombres.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
+                  {listaNombres.map((nom, index) => (
+                    <div key={index} style={{
+                      background: 'rgba(251, 191, 36, 0.2)',
+                      border: '1px solid var(--gold)',
+                      borderRadius: '20px',
+                      padding: '5px 15px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      fontSize: '0.9rem'
+                    }}>
+                      {nom}
+                      <span 
+                        onClick={() => handleBorrarNombre(index)}
+                        style={{ color: '#ff6b6b', cursor: 'pointer', fontWeight: 'bold' }}
+                      >
+                        ×
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <div className="form-group">
               <label>Menú Especial (Restricciones)</label>
@@ -170,10 +233,23 @@ export default function RSVP() {
                 rows="3" 
                 value={formData.comentarios} 
                 onChange={handleChange} 
-                placeholder="Ej: Mi acompañante es celíaco, o llevaré cochecito de bebé..."
+                placeholder="Ej: Soy Juan Pérez y soy celíaco, o llevaremos cochecito de bebé..."
               ></textarea>
             </div>
           </>
+        )}
+
+        {formData.asistencia === 'no' && (
+          <div className="form-group">
+            <label>Dejale un mensaje a Melanie (Opcional)</label>
+            <textarea 
+              name="comentarios" 
+              rows="3" 
+              value={formData.comentarios} 
+              onChange={handleChange} 
+              placeholder="Ej: ¡Que tengas una noche hermosa, te quiero mucho!"
+            ></textarea>
+          </div>
         )}
 
         <button type="submit" className="btn submit-btn" disabled={isSubmitting}>
