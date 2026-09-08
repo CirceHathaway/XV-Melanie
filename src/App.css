@@ -325,28 +325,63 @@ body {
 
 /* MEDIA QUERIES (VERSIÓN CELULAR) */
 @media (max-width: 768px) {
-    .hero { height: 100vh; min-height: 550px; flex-direction: column; overflow-x: hidden; }
+    /* 1. ELIMINAR EL SCROLL FANTASMA: Altura exacta y ocultar lo que sobra de la ola */
+    .hero { 
+        height: 100dvh; 
+        min-height: auto; 
+        flex-direction: column; 
+        overflow: hidden; /* <-- Esto es lo que mata la barra de scroll definitivamente */
+    }
     
-    /* CORRECCIÓN 1: Quitamos el padding inferior de 100px que empujaba todo hacia el techo */
-    .hero-center-layout { padding: 40px 15px; }
+    /* 2. CENTRADO PERFECTO: El flexbox se encarga de repartir el espacio equitativamente */
+    .hero-center-layout { 
+        padding: 20px 15px; 
+        display: flex;
+        justify-content: center; /* Centra todo el bloque unido en la pantalla */
+        align-items: center;
+    }
     
-    .hero-split-layout { flex-direction: column; height: auto; }
-    .hero-photo-side { width: 100%; height: 50vh; min-height: 350px; }
-    .hero-text-side-container { width: 100%; height: auto; padding: 60px 15px 40px 15px; }
-    .vertical-separator-img { display: none; }
-    .horizontal-separator-container { bottom: -20px; top: auto; } 
-    .horizontal-separator-img { height: auto; max-height: 100px; }
+    .horizontal-separator-container { bottom: 0; top: auto; } 
+    .horizontal-separator-img { height: auto; max-height: 130px; }
     
-    /* CORRECCIÓN 2: Quitamos el margen negativo y lo centramos bien para que baje hacia la ola */
-    .hero-text-content { margin-top: 20px; } 
+    /* Limpiamos el margen negativo que empujaba todo al techo */
+    .hero-text-content { 
+        margin-top: 0; 
+    } 
     
-    .hero-sun { width: 100px; margin-bottom: 10px; top: 0; position: relative; }
+    .hero-sun { 
+        width: 110px; 
+        margin-bottom: 15px; 
+        position: relative; 
+        top: 0; 
+    }
     
-    /* NUEVO: Sube solo "Mis XV Años" manteniendo el sol en su lugar */
-    .hero .top-title { font-size: 1.8rem; letter-spacing: 2px; margin: 0; position: relative; top: -15px; }
+    /* 3. ARREGLAR LA SUPERPOSICIÓN: Quitamos los 'top' negativos que encimaban las letras */
+    .hero .top-title { 
+        font-size: 1.8rem; 
+        letter-spacing: 2px; 
+        margin: 0; 
+        position: relative; 
+        top: 0; /* <-- Vuelve a su lugar */
+    }
     
-    .hero h1 { font-size: 4.7rem; line-height: 1.3; margin: 0; padding: 0 10px; }
-    .hero-quote { font-size: 1rem; margin: 15px 0 0 0; padding: 0 10px; }
+    .hero h1 { 
+        font-size: 4.7rem; 
+        line-height: 1.2; 
+        margin: 5px 0 0 0; /* Un margen mínimo para que no toque 'Mis XV Años' */
+        padding: 0 10px; 
+        position: relative;
+        top: 0; /* <-- Baja a su lugar natural */
+    }
+    
+    /* Espaciado normal de la frase, unida al bloque */
+    .hero-quote { 
+        font-size: 1rem; 
+        margin: 20px 0 0 0; 
+        padding: 0 15px; 
+    }
+    
+    /* --- RESTO DE TUS SECCIONES (SE MANTIENEN IGUAL) --- */
     .after-hero-container { padding-top: 40px; }
     .subtitle { font-size: 2.8rem; padding: 0 10px; }
     .countdown { gap: 10px; margin: 30px 0; }
