@@ -9,8 +9,8 @@ import { db } from '../firebaseConfig';
 export default function RSVP() {
   const [formData, setFormData] = useState({
     asistencia: 'si',
-    adultos: '1', // <-- VUELVE EL ESTADO DE ADULTOS
-    ninos: '0',   // <-- VUELVE EL ESTADO DE NIÑOS
+    adultos: '1', 
+    ninos: '0',   
     dieta: 'ninguna',
     comentarios: ''
   });
@@ -42,8 +42,9 @@ export default function RSVP() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (listaNombres.length === 0 && formData.asistencia === 'si') {
-      alert("Por favor, agrega al menos un nombre a la lista de invitados.");
+    // CAMBIO: Ahora exige el nombre independientemente de si asiste o no
+    if (listaNombres.length === 0) {
+      alert("Por favor, agrega al menos un nombre para saber de quién se trata.");
       return;
     }
 
@@ -114,9 +115,68 @@ export default function RSVP() {
           </select>
         </div>
 
+        {/* --- CAMBIO: BLOQUE DE NOMBRES SIEMPRE VISIBLE --- */}
+        <div className="form-group">
+          <label>
+            {formData.asistencia === 'si' 
+              ? 'Ingresar el NOMBRE y APELLIDO de cada invitado *' 
+              : 'Ingresar el NOMBRE y APELLIDO de quien no podrá asistir *'}
+          </label>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <input 
+              type="text" 
+              value={nombreInput} 
+              onChange={(e) => setNombreInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleAgregarNombre(e)}
+              placeholder="Ej: Juan Pérez"
+              style={{ flex: 1 }}
+            />
+            <button 
+              type="button" 
+              onClick={handleAgregarNombre}
+              style={{
+                padding: '0 20px',
+                background: 'var(--gold)',
+                color: 'var(--purple-deep)',
+                border: 'none',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}
+            >
+              Agregar
+            </button>
+          </div>
+
+          {listaNombres.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
+              {listaNombres.map((nom, index) => (
+                <div key={index} style={{
+                  background: 'rgba(251, 191, 36, 0.2)',
+                  border: '1px solid var(--gold)',
+                  borderRadius: '20px',
+                  padding: '5px 15px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  fontSize: '0.9rem'
+                }}>
+                  {nom}
+                  <span 
+                    onClick={() => handleBorrarNombre(index)}
+                    style={{ color: '#ff6b6b', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    ×
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* --- DATOS QUE SOLO IMPORTAN SI ASISTE --- */}
         {formData.asistencia === 'si' && (
           <>
-            {/* --- VUELVEN LOS CONTADORES --- */}
             <div className="form-row">
               <div className="form-group half">
                 <label>Adultos *</label>
@@ -161,60 +221,6 @@ export default function RSVP() {
             </div>
 
             <div className="form-group">
-              <label>Ingresar el NOMBRE y APELLIDO de cada invitado *</label>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <input 
-                  type="text" 
-                  value={nombreInput} 
-                  onChange={(e) => setNombreInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleAgregarNombre(e)}
-                  placeholder="Ej: Juan Pérez"
-                  style={{ flex: 1 }}
-                />
-                <button 
-                  type="button" 
-                  onClick={handleAgregarNombre}
-                  style={{
-                    padding: '0 20px',
-                    background: 'var(--gold)',
-                    color: 'var(--purple-deep)',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontWeight: 'bold',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Agregar
-                </button>
-              </div>
-
-              {listaNombres.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
-                  {listaNombres.map((nom, index) => (
-                    <div key={index} style={{
-                      background: 'rgba(251, 191, 36, 0.2)',
-                      border: '1px solid var(--gold)',
-                      borderRadius: '20px',
-                      padding: '5px 15px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px',
-                      fontSize: '0.9rem'
-                    }}>
-                      {nom}
-                      <span 
-                        onClick={() => handleBorrarNombre(index)}
-                        style={{ color: '#ff6b6b', cursor: 'pointer', fontWeight: 'bold' }}
-                      >
-                        ×
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="form-group">
               <label>Menú Especial (Restricciones)</label>
               <select name="dieta" value={formData.dieta} onChange={handleChange}>
                 <option value="ninguna">Ninguna</option>
@@ -239,6 +245,7 @@ export default function RSVP() {
           </>
         )}
 
+        {/* --- MENSAJE PARA MELANIE SI NO ASISTE --- */}
         {formData.asistencia === 'no' && (
           <div className="form-group">
             <label>Dejale un mensaje a Melanie (Opcional)</label>
